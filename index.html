@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Read XML File with JavaScript</title>
+</head>
+<body>
+  <input type="file" id="xmlFileInput">
+  <pre id="xmlContent"></pre>
+
+  <script>
+    document.getElementById('xmlFileInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+          const xmlContent = event.target.result;
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+          
+          var transUnit = xmlDoc.querySelector('trans-unit[id="42007"]');
+          
+        if (transUnit) {
+    var targetElement = transUnit.querySelector('target');
+    var targetText = targetElement.textContent;
+
+    // Now you can save the targetText to a file
+    var blob = new Blob([targetText], { type: 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'output.txt';
+    a.textContent = 'Retrive the value';
+    a.classList.add('button');
+    document.body.appendChild(a);
+} else {
+    console.log("Trans-unit with id='42007' not found.");
+}
+        };
+
+        reader.readAsText(file);
+      }
+    });
+  </script>
+</body>
+</html>
