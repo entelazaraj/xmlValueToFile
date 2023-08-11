@@ -2,46 +2,77 @@
 <html>
 <head>
   <link rel="stylesheet" href="style.css">
-  <title>Get a value from XML File with JavaScript</title>
+  <title>Get a value by id and save to a file</title>
 </head>
 <body>
-  <input type="file" id="xmlFileInput">
-  <pre id="xmlContent"></pre>
+  <div class="centered-element">
+      <input type="file" id="xmlFileInput">
+      <pre id="xmlContent"></pre>
 
+      <label id="lableId" class="styled-label" hidden>Id</label>
+      <input id="imputValue" class="styled-input" placeholder="Enter attribute id" hidden></input>
+      <button id="getValueButton" class="button" hidden>Save to file</button>
+  
   <script>
+      var input = document.getElementById("imputValue");
+      var saveButton = document.getElementById('getValueButton');
+      input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          saveButton.click();
+        }
+      });
+
+
+    let xmlDoc = null;
+
     document.getElementById('xmlFileInput').addEventListener('change', function(event) {
-      const xmlFile = event.target.files[0];
-      if (xmlFile) {
+      const file = event.target.files[0];
+
+      if (file) {
         const reader = new FileReader();
 
         reader.onload = function(event) {
-          const xmlContent = event.target.result;
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
-          
-          var transUnit = xmlDoc.querySelector('trans-unit[id="42007"]');
-          
-          if (transUnit) {
+        const xmlContent = event.target.result;
+        const parser = new DOMParser();
+        xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+
+        // Show input elements and get button
+        saveButton.hidden = false;
+        input.hidden = false;
+        document.getElementById('lableId').hidden = false;
+        };
+
+        reader.readAsText(file);
+      }
+    });
+    
+    saveButton.addEventListener('click', function() 
+    {
+      if (xmlDoc) 
+      {
+      const textValue = document.getElementById('imputValue').value;
+
+        var transUnit = xmlDoc.querySelector(`trans-unit[id="${textValue}"]`);
+          if (transUnit) 
+          {    
             var targetElement = transUnit.querySelector('target');
             var targetText = targetElement.textContent;
 
-            // Save the selected value to a file
+            // Save the targetText to a file
             var blob = new Blob([targetText], { type: 'text/plain' });
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
-            a.download = 'output.txt';
-            a.textContent = 'Retrive the value';
+            a.download = 'result.txt';
             a.classList.add('button');
-            document.body.appendChild(a);
+            a.click();
           } else {
-            console.log("id='42007' not found.");
-          }
-        };
-
-        reader.readAsText(xmlFile);
+            alert(`id="${textValue}" not found`)
+        }
       }
     });
   </script>
+  </div>
 </body>
 </html>
